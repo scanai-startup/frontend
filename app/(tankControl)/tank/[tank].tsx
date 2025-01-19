@@ -1,5 +1,8 @@
 import ActivityCard from "@/components/ActivityCard";
 import AppHeader from "@/components/AppHeader";
+import CenteredModal from "@/components/CenteredModal";
+import { DefaultButton } from "@/components/DefaultButton";
+import { InputBox } from "@/components/Input";
 import SafeAreaView from "@/components/SafeAreaView";
 import { useShipmentStore } from "@/store/remessasContext";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
@@ -11,14 +14,17 @@ import {
   Microscope,
   Milk,
   TestTubeDiagonal,
+  Pencil,
+  X,
 } from "lucide-react-native";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 
 export default function Tank() {
   const { tank, depositId, content, contentId } = useLocalSearchParams();
   const router = useRouter();
   const { clearShipments } = useShipmentStore();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -97,9 +103,43 @@ export default function Tank() {
         returnHref={router.back}
       />
       <View>
-        <Text className="text-zinc-950 font-bold text-2xl ml-7 mb-4">
-          Ações
-        </Text>
+        <View className="flex flex-row justify-between px-7 items-center mb-4">
+          <Text className="text-zinc-950 font-bold text-2xl">Ações</Text>
+            <View className="flex flex-row justify-between items-center gap-4 border p-2 bg-white" 
+              onTouchStart={()=> setIsDialogOpen(true)}
+            >
+              <Text className="text-blue-500">Editar Tanque</Text>
+              <Pencil
+                size="25px"
+                color="black"
+              />
+            </View>
+            <CenteredModal
+              isDialogOpen={isDialogOpen}
+              handleDialogClose={() => setIsDialogOpen(false)}
+            >
+              <View className="px-6 py-10 bg-white rounded-xl relative">
+                <X
+                  style={{ position: 'absolute', top: 16, right: 16  }}
+                  size={35}
+                  color="black"
+                  onPress={() => setIsDialogOpen(false)}
+                />
+                <Text className="text-xl mt-8 mb-4">
+                  Alterações que podem ser feitas no tanque
+                </Text>
+                <View className="gap-8">
+                  <InputBox
+                    title="Editar Volume"
+                    placeholder="500 (Aqui virá o volume atual)"
+                  >
+                    <Text className="text-xl">L</Text>
+                  </InputBox>
+                  <DefaultButton title="Concluir" onPress={()=> null} />
+                </View>
+              </View>
+            </CenteredModal>
+        </View>
         <FlatList
           data={filterActivityItems()}
           keyExtractor={(item) => item.name}

@@ -2,18 +2,16 @@ import apiInstance from "@/api/apiInstance";
 import CustomStatusBar from "@/components/CustomStatusBar";
 import { InputBox } from "@/components/Input";
 import SafeAreaView from "@/components/SafeAreaView";
-import { useTokenStore } from "@/store/userData";
-import { useToast } from "@/hooks/useToast";
-import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-import { useState } from "react";
+import {  useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
+import { useAutoLogin } from "@/hooks/useAutoLogin";
+import { useAuth } from "@/hooks/useAuth";
+
 export default function Login() {
   const [matricula, setMatricula] = useState("");
   const [senha, setSenha] = useState("");
-
-  const router = useRouter();
+  useAutoLogin();
 
   return (
     <>
@@ -42,7 +40,7 @@ export default function Login() {
               />
             </View>
             <View className="flex w-full items-center mt-14">
-              <Button
+              <LoginButton
                 placeholder="Acessar"
                 route="/(tabs)"
                 matricula={matricula}
@@ -71,9 +69,8 @@ const B = (props: any) => (
   <Text style={{ fontWeight: "bold" }}>{props.children}</Text>
 );
 
-function Button({
+function LoginButton({
   placeholder,
-  route,
   matricula,
   senha,
 }: {
@@ -82,36 +79,12 @@ function Button({
   matricula: string;
   senha: string;
 }) {
-  const router = useRouter();
-  const { setToken } = useTokenStore();
-  const toast = useToast();
-
-  const fetch = async () => {
-    try {
-      const response = await apiInstance.post("/auth/login", {
-        matricula: matricula,
-        senha: senha,
-      });
-      const token = response.data.token;
-      console.log(response.data)
-      setToken(token);
-      await SecureStore.setItemAsync("user-token", token);
-      router.push("/(tabs)/");
-      toast({ heading: "Sucesso", message: "Seja bem-vindo!" });
-    } catch (e) {
-      toast({
-        heading: "Erro",
-        message: "Houve um erro, por favor verifique suas credenciais.",
-        type: "error",
-      });
-      console.log(e);
-    }
-  };
+  const { login } = useAuth();
 
   return (
     <TouchableOpacity
       className="bg-[#171717] w-full flex items-center rounded-lg p-4"
-      onPress={() => fetch()}
+      onPress={() => login(matricula, senha)}
     >
       <Text className="text-white text-lg font-medium ">{placeholder}</Text>
     </TouchableOpacity>

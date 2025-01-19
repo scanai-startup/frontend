@@ -10,9 +10,10 @@ import {
 interface InputBoxProps extends TextInputProps {
   title: string;
   auxText?: string;
+  children?: React.ReactNode
 }
 
-export function InputBox({ title, auxText = "", ...rest }: InputBoxProps) {
+export function InputBox({ title, auxText = "", children, ...rest }: InputBoxProps) {
   return (
     <KeyboardAvoidingView className="flex-col items-start font-medium h-auto w-full">
       <Text className="text-xl">{title}</Text>
@@ -22,6 +23,9 @@ export function InputBox({ title, auxText = "", ...rest }: InputBoxProps) {
           {...rest}
         />
         {auxText && <Text>{auxText}</Text>}
+        <View>
+          {children}
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
